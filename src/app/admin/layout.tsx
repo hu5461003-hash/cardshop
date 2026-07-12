@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -15,6 +16,8 @@ import {
   CreditCard,
 } from "lucide-react";
 import { t } from "@/lib/i18n";
+
+const COOKIE_NAME = "cardshop_admin_token";
 
 const navItems = [
   { href: "/admin", label: "admin.dashboard.title", icon: LayoutDashboard },
@@ -31,7 +34,14 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = () => {
+    // 清除认证 cookie
+    document.cookie = `${COOKIE_NAME}=;path=/;max-age=0`;
+    router.push("/admin/login");
+  };
 
   return (
     <div className="min-h-screen flex bg-dark-1">
@@ -62,17 +72,25 @@ export default function AdminLayout({
             );
           })}
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-glass-border">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-glass-border space-y-1">
           <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-4 hover:text-light-3 hover:bg-glass-bg transition-colors">
             <LogOut size={18} />
             返回前台
           </Link>
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-error/70 hover:text-error hover:bg-error/10 transition-colors cursor-pointer">
+            <LogOut size={18} />
+            退出登录
+          </button>
         </div>
       </aside>
       <div className="flex-1 md:ml-64">
         <header className="sticky top-0 z-30 h-16 bg-dark-1/80 backdrop-blur-xl border-b border-glass-border flex items-center px-6">
           <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 rounded-lg text-gray-4 hover:text-light-3 cursor-pointer"><Menu size={18} /></button>
           <div className="flex-1" />
+          <button onClick={handleLogout} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-gray-4 hover:text-error hover:bg-error/10 transition-colors cursor-pointer">
+            <LogOut size={14} />
+            退出
+          </button>
         </header>
         <main className="p-6">{children}</main>
       </div>

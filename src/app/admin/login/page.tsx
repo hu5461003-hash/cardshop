@@ -5,19 +5,31 @@ import { useRouter } from "next/navigation";
 import { Lock, User, ArrowRight } from "lucide-react";
 import { t } from "@/lib/i18n";
 
+const ADMIN_TOKEN = "cs_admin_2024_secure";
+const COOKIE_NAME = "cardshop_admin_token";
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 天
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    // 模拟验证（生产环境应调用后端 API）
     if (username === "admin" && password === "admin123") {
+      // 设置认证 cookie
+      document.cookie = `${COOKIE_NAME}=${ADMIN_TOKEN};path=/;max-age=${COOKIE_MAX_AGE};SameSite=Lax`;
       router.push("/admin");
     } else {
       setError(t("admin.login.error"));
     }
+    setLoading(false);
   };
 
   return (
@@ -47,7 +59,9 @@ export default function AdminLoginPage() {
               </div>
             </div>
             {error && <p className="text-xs text-error">{error}</p>}
-            <button type="submit" className="btn-primary w-full text-sm flex items-center justify-center gap-2">{t("admin.login.submit")} <ArrowRight size={16} /></button>
+            <button type="submit" disabled={loading} className="btn-primary w-full text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              {loading ? "登录中..." : <>{t("admin.login.submit")} <ArrowRight size={16} /></>}
+            </button>
           </form>
         </div>
         <p className="text-xs text-gray-4 text-center mt-4">{t("admin.login.demo")}</p>
