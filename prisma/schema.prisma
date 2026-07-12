@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String   // bcrypt hashed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  stockType   String    @default("one_time") // one_time | repeatable
+  isActive    Boolean   @default(true)
+  image       String?
+  cards       CardStock[]
+  orders      Order[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([categoryId])
+  @@index([isActive])
+}
+
+model CardStock {
+  id              String   @id @default(cuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
+  encryptedContent String  // AES-256-GCM encrypted
+  isSold          Boolean  @default(false)
+  orderId         String?
+  createdAt       DateTime @default(now())
+
+  @@index([productId])
+  @@index([isSold])
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  orderNo       String   @unique
+  email         String
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id])
+  quantity      Int
+  unitPrice     Float
+  totalAmount   Float
+  paymentMethod String   @default("stripe") // stripe | crypto
+  status        String   @default("pending") // pending | paid | delivered | failed | refunded
+  cardContent   String?  // decrypted content shown to user after payment
+  txId          String?  // payment transaction ID
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([orderNo])
+}
+
+model SiteSettings {
+  id             String   @id @default(cuid())
+  siteName       String   @default("CardShop")
+  siteDescription String?
+  seoMeta        String?
+  announcement   String?
+  supportLink    String?
+  customDomain   String?
+  updatedAt      DateTime @updatedAt
+}
