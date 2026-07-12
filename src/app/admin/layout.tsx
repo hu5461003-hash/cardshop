@@ -37,10 +37,9 @@ export default function AdminLayout({
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleLogout = () => {
-    // 清除认证 cookie
-    document.cookie = `${COOKIE_NAME}=;path=/;max-age=0`;
-    router.push("/admin/login");
+  const handleLogout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" });
+    window.location.href = "/admin/login";
   };
 
   return (

@@ -5,10 +5,6 @@ import { useRouter } from "next/navigation";
 import { Lock, User, ArrowRight } from "lucide-react";
 import { t } from "@/lib/i18n";
 
-const ADMIN_TOKEN = "cs_admin_2024_secure";
-const COOKIE_NAME = "cardshop_admin_token";
-const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 天
-
 export default function AdminLoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
@@ -21,13 +17,22 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError("");
 
-    // 模拟验证（生产环境应调用后端 API）
-    if (username === "admin" && password === "admin123") {
-      // 设置认证 cookie
-      document.cookie = `${COOKIE_NAME}=${ADMIN_TOKEN};path=/;max-age=${COOKIE_MAX_AGE};SameSite=Lax`;
-      router.push("/admin");
-    } else {
-      setError(t("admin.login.error"));
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (res.ok) {
+        // 登录成功，使用 window.location 硬跳转确保 cookie 生效
+        window.location.href = "/admin";
+      } else {
+        const data = await res.json();
+        setError(data.message || t("admin.login.error"));
+      }
+    } catch {
+      setError("网络错误，请重试");
     }
     setLoading(false);
   };
