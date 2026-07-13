@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ShoppingCart, Search, Menu, Globe } from "lucide-react";
+import { Search, Menu, Globe } from "lucide-react";
 import { useLocaleStore } from "@/store/use-locale-store";
 import { t } from "@/lib/i18n";
 import { getSettings } from "@/lib/mock-data";
@@ -43,9 +43,6 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <button className="p-2 rounded-lg text-gray-4 hover:text-light-3 hover:bg-glass-bg transition-colors cursor-pointer">
             <Search size={18} />
-          </button>
-          <button className="p-2 rounded-lg text-gray-4 hover:text-light-3 hover:bg-glass-bg transition-colors cursor-pointer">
-            <ShoppingCart size={18} />
           </button>
           {/* Language Toggle */}
           <button

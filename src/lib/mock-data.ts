@@ -285,7 +285,17 @@ export function getStore(): StoreData {
   if (!isBrowser()) return defaultData;
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
-    try { return JSON.parse(stored); } catch { /* fall through */ }
+    try {
+      const parsed = JSON.parse(stored);
+      // 兼容旧数据：确保新增字段存在
+      if (!parsed.agents) parsed.agents = [];
+      if (!parsed.adminToken) parsed.adminToken = defaultData.adminToken;
+      if (!parsed.paymentChannels) parsed.paymentChannels = defaultData.paymentChannels;
+      if (parsed.settings && parsed.settings.faviconUrl === undefined) parsed.settings.faviconUrl = "";
+      if (parsed.settings && parsed.settings.adminUsername === undefined) parsed.settings.adminUsername = "admin";
+      if (parsed.settings && parsed.settings.adminPassword === undefined) parsed.settings.adminPassword = "admin123";
+      return parsed;
+    } catch { /* fall through */ }
   }
   return defaultData;
 }

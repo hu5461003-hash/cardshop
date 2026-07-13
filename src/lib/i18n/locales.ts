@@ -235,7 +235,7 @@ export const locales: Record<Locale, Record<string, string>> = {
   zh: {
     // Common
     "common.siteName": "CardShop",
-    "common.currency": "$",
+    "common.currency": "¥",
     "common.inStock": "库存",
     "common.lowStock": "库存不足",
     "common.buyNow": "立即购买",
