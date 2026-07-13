@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import CustomerChatWidget from "@/components/chat/customer-chat-widget";
 import { useLocaleStore } from "@/store/use-locale-store";
 
 export default function StorefrontLayout({
@@ -23,6 +24,7 @@ export default function StorefrontLayout({
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <CustomerChatWidget />
     </>
   );
 }

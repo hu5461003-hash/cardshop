@@ -189,6 +189,7 @@ export const locales: Record<Locale, Record<string, string>> = {
     // Admin Payments
     "admin.payments.title": "Payment Settings",
     "admin.agents.title": "Agents",
+    "admin.chat.title": "Chat",
     "admin.agents.total": "Total Agents",
     "admin.agents.active": "Active Agents",
     "admin.agents.totalCommission": "Total Commission",
@@ -420,6 +421,7 @@ export const locales: Record<Locale, Record<string, string>> = {
     // Admin Payments
     "admin.payments.title": "支付设置",
     "admin.agents.title": "代理管理",
+    "admin.chat.title": "聊天管理",
     "admin.agents.total": "代理总数",
     "admin.agents.active": "活跃代理",
     "admin.agents.totalCommission": "总佣金支出",

@@ -92,6 +92,16 @@ export interface Agent {
   updatedAt: string;
 }
 
+export interface ChatMessage {
+  id: string;
+  sessionId: string;       // 聊天会话 ID（访客自动生成）
+  sender: "visitor" | "admin"; // 发送者
+  senderName: string;      // 发送者名称
+  message: string;         // 消息内容
+  isRead: boolean;         // 是否已读
+  createdAt: string;
+}
+
 export interface StoreData {
   categories: Category[];
   products: Product[];
@@ -100,6 +110,7 @@ export interface StoreData {
   settings: SiteSettings;
   paymentChannels: PaymentChannel[];
   agents: Agent[];
+  chatMessages: ChatMessage[];
   adminToken: string;  // 当前有效的管理员认证 token
 }
 
@@ -251,6 +262,7 @@ const defaultData: StoreData = {
   settings: defaultSettings,
   paymentChannels: defaultPaymentChannels,
   agents: [],
+  chatMessages: [],
   adminToken: "cs_admin_2024_secure",
 };
 
@@ -294,6 +306,7 @@ export function getStore(): StoreData {
       if (parsed.settings && parsed.settings.faviconUrl === undefined) parsed.settings.faviconUrl = "";
       if (parsed.settings && parsed.settings.adminUsername === undefined) parsed.settings.adminUsername = "admin";
       if (parsed.settings && parsed.settings.adminPassword === undefined) parsed.settings.adminPassword = "admin123";
+      if (!parsed.chatMessages) parsed.chatMessages = [];
       return parsed;
     } catch { /* fall through */ }
   }
@@ -651,4 +664,62 @@ export function toggleAgentStatus(id: string): Agent | undefined {
   agent.updatedAt = new Date().toISOString();
   saveData(store);
   return agent;
+}
+
+// ============================================
+// Chat CRUD
+// ============================================
+export function getChatMessages(): ChatMessage[] {
+  return getStore().chatMessages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+}
+
+export function getChatSessions(): { sessionId: string; lastMessage: string; lastTime: string; unreadCount: number; visitorName: string }[] {
+  const messages = getStore().chatMessages;
+  const sessionMap = new Map<string, { messages: ChatMessage[] }>();
+  messages.forEach(m => {
+    if (!sessionMap.has(m.sessionId)) sessionMap.set(m.sessionId, { messages: [] });
+    sessionMap.get(m.sessionId)!.messages.push(m);
+  });
+  const sessions: { sessionId: string; lastMessage: string; lastTime: string; unreadCount: number; visitorName: string }[] = [];
+  sessionMap.forEach((val, key) => {
+    const sorted = val.messages.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const lastMsg = sorted[0];
+    const unread = sorted.filter(m => m.sender === "visitor" && !m.isRead).length;
+    sessions.push({
+      sessionId: key,
+      lastMessage: lastMsg.message.substring(0, 50),
+      lastTime: lastMsg.createdAt,
+      unreadCount: unread,
+      visitorName: lastMsg.senderName,
+    });
+  });
+  return sessions.sort((a, b) => new Date(b.lastTime).getTime() - new Date(a.lastTime).getTime());
+}
+
+export function getSessionMessages(sessionId: string): ChatMessage[] {
+  return getStore().chatMessages.filter(m => m.sessionId === sessionId).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+}
+
+export function addChatMessage(data: { sessionId: string; sender: "visitor" | "admin"; senderName: string; message: string }): ChatMessage {
+  const store = getStore();
+  const msg: ChatMessage = {
+    id: generateId(),
+    sessionId: data.sessionId,
+    sender: data.sender,
+    senderName: data.senderName,
+    message: data.message,
+    isRead: data.sender === "admin",
+    createdAt: new Date().toISOString(),
+  };
+  store.chatMessages.push(msg);
+  saveData(store);
+  return msg;
+}
+
+export function markSessionRead(sessionId: string): void {
+  const store = getStore();
+  store.chatMessages.forEach(m => {
+    if (m.sessionId === sessionId && m.sender === "visitor") m.isRead = true;
+  });
+  saveData(store);
 }

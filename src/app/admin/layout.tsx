@@ -15,6 +15,7 @@ import {
   LogOut,
   CreditCard,
   Users,
+  MessageCircle,
 } from "lucide-react";
 import { t } from "@/lib/i18n";
 
@@ -27,6 +28,7 @@ const navItems = [
   { href: "/admin/orders", label: "admin.orders.title", icon: ShoppingCart },
   { href: "/admin/payments", label: "admin.payments.title", icon: CreditCard },
   { href: "/admin/agents", label: "admin.agents.title", icon: Users },
+  { href: "/admin/chat", label: "admin.chat.title", icon: MessageCircle },
   { href: "/admin/settings", label: "admin.settings.title", icon: Settings },
 ];
 
