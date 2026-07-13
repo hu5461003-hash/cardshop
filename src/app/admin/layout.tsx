@@ -14,6 +14,7 @@ import {
   X,
   LogOut,
   CreditCard,
+  Users,
 } from "lucide-react";
 import { t } from "@/lib/i18n";
 
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/admin/cards", label: "admin.cards.title", icon: Key },
   { href: "/admin/orders", label: "admin.orders.title", icon: ShoppingCart },
   { href: "/admin/payments", label: "admin.payments.title", icon: CreditCard },
+  { href: "/admin/agents", label: "admin.agents.title", icon: Users },
   { href: "/admin/settings", label: "admin.settings.title", icon: Settings },
 ];
 

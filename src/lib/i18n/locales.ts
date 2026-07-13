@@ -188,6 +188,11 @@ export const locales: Record<Locale, Record<string, string>> = {
     "admin.settings.supportEmail": "Support Email",
     // Admin Payments
     "admin.payments.title": "Payment Settings",
+    "admin.agents.title": "Agents",
+    "admin.agents.total": "Total Agents",
+    "admin.agents.active": "Active Agents",
+    "admin.agents.totalCommission": "Total Commission",
+    "admin.agents.totalOrders": "Total Referral Orders",
     "admin.payments.desc": "Configure payment channels and collection parameters",
     "admin.payments.wechat": "WeChat Pay",
     "admin.payments.alipay": "Alipay",
@@ -414,6 +419,11 @@ export const locales: Record<Locale, Record<string, string>> = {
     "admin.settings.supportEmail": "客服邮箱",
     // Admin Payments
     "admin.payments.title": "支付设置",
+    "admin.agents.title": "代理管理",
+    "admin.agents.total": "代理总数",
+    "admin.agents.active": "活跃代理",
+    "admin.agents.totalCommission": "总佣金支出",
+    "admin.agents.totalOrders": "推广订单数",
     "admin.payments.desc": "配置支付通道和收款参数",
     "admin.payments.wechat": "微信支付",
     "admin.payments.alipay": "支付宝",

@@ -76,6 +76,22 @@ export interface PaymentChannel {
   createdAt: string;
 }
 
+export interface Agent {
+  id: string;
+  name: string;
+  username: string;       // 登录用户名
+  password: string;       // 登录密码
+  contactInfo: string;    // 联系方式（微信/QQ/Telegram等）
+  commissionRate: number; // 佣金比例（百分比，如 10 表示 10%）
+  balance: number;         // 可提现余额
+  totalEarnings: number;   // 累计收益
+  totalOrders: number;    // 累计推广订单数
+  status: "active" | "disabled"; // 状态
+  apiKey: string;         // 代理专属推广 API Key
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface StoreData {
   categories: Category[];
   products: Product[];
@@ -83,6 +99,7 @@ export interface StoreData {
   orders: Order[];
   settings: SiteSettings;
   paymentChannels: PaymentChannel[];
+  agents: Agent[];
   adminToken: string;  // 当前有效的管理员认证 token
 }
 
@@ -233,6 +250,7 @@ const defaultData: StoreData = {
   orders: defaultOrders,
   settings: defaultSettings,
   paymentChannels: defaultPaymentChannels,
+  agents: [],
   adminToken: "cs_admin_2024_secure",
 };
 
@@ -561,4 +579,66 @@ export function updateAdminCredentials(username: string, password: string): Site
 
 export function getAdminToken(): string {
   return getStore().adminToken;
+}
+
+// ============================================
+// Agent (代理) CRUD
+// ============================================
+
+export function getAgents(): Agent[] {
+  return getStore().agents;
+}
+
+export function getAgentById(id: string): Agent | undefined {
+  return getStore().agents.find((a) => a.id === id);
+}
+
+export function createAgent(data: { name: string; username: string; password: string; contactInfo: string; commissionRate: number }): Agent {
+  const store = getStore();
+  const agent: Agent = {
+    id: generateId(),
+    name: data.name,
+    username: data.username,
+    password: data.password,
+    contactInfo: data.contactInfo,
+    commissionRate: data.commissionRate,
+    balance: 0,
+    totalEarnings: 0,
+    totalOrders: 0,
+    status: "active",
+    apiKey: "ag_" + Date.now().toString(36) + Math.random().toString(36).substr(2, 12),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  store.agents.push(agent);
+  saveData(store);
+  return agent;
+}
+
+export function updateAgent(id: string, data: Partial<Agent>): Agent | undefined {
+  const store = getStore();
+  const index = store.agents.findIndex((a) => a.id === id);
+  if (index === -1) return undefined;
+  store.agents[index] = { ...store.agents[index], ...data, updatedAt: new Date().toISOString() };
+  saveData(store);
+  return store.agents[index];
+}
+
+export function deleteAgent(id: string): boolean {
+  const store = getStore();
+  const index = store.agents.findIndex((a) => a.id === id);
+  if (index === -1) return false;
+  store.agents.splice(index, 1);
+  saveData(store);
+  return true;
+}
+
+export function toggleAgentStatus(id: string): Agent | undefined {
+  const store = getStore();
+  const agent = store.agents.find((a) => a.id === id);
+  if (!agent) return undefined;
+  agent.status = agent.status === "active" ? "disabled" : "active";
+  agent.updatedAt = new Date().toISOString();
+  saveData(store);
+  return agent;
 }
