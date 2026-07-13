@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
             </button>
           </form>
         </div>
-        <p className="text-xs text-gray-4 text-center mt-4">{t("admin.login.demo")}</p>
+
       </div>
     </div>
   );

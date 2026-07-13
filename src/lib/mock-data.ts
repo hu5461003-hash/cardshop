@@ -60,6 +60,9 @@ export interface SiteSettings {
   supportLink: string;
   supportEmail: string;
   customDomain: string;
+  faviconUrl: string;  // 网站 favicon 图标 URL
+  adminUsername: string;
+  adminPassword: string;  // 明文存储，仅用于演示，生产环境应使用 bcrypt hash
 }
 
 export interface PaymentChannel {
@@ -80,6 +83,7 @@ export interface StoreData {
   orders: Order[];
   settings: SiteSettings;
   paymentChannels: PaymentChannel[];
+  adminToken: string;  // 当前有效的管理员认证 token
 }
 
 const STORAGE_KEY = "cardshop_data";
@@ -103,6 +107,9 @@ const defaultSettings: SiteSettings = {
   supportLink: "https://t.me/cardshop_support",
   supportEmail: "support@cardshop.com",
   customDomain: "zap534.site",
+  faviconUrl: "",
+  adminUsername: "admin",
+  adminPassword: "admin123",
 };
 
 const defaultCategories: Category[] = [
@@ -115,15 +122,15 @@ const defaultCategories: Category[] = [
 ];
 
 const defaultProducts: Product[] = [
-  { id: "prod-1", name: "Telegram \u8001\u53F7 (2022)", description: "2022\u5E74\u6CE8\u518C\u7684 Telegram \u8001\u53F7\uFF0C\u65E0\u5C01\u7981\u8BB0\u5F55\u3002", price: 5.99, categoryId: "cat-1", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "prod-2", name: "Telegram Premium \u8D26\u53F7", description: "\u5E26 Premium \u8BA2\u9605\u7684 Telegram \u8D26\u53F7\u3002", price: 12.99, categoryId: "cat-1", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "prod-3", name: "Twitter \u8001\u53F7 (2021)", description: "2021\u5E74\u6CE8\u518C\uFF0C\u6709\u81EA\u7136\u7C89\u4E1D\uFF0C\u90AE\u7BB1\u5DF2\u9A8C\u8BC1\u3002", price: 8.49, categoryId: "cat-2", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "prod-4", name: "Twitter \u9AD8\u7C89\u53F7", description: "5K+ \u771F\u5B9E\u7C89\u4E1D\u7684 Twitter \u8D26\u53F7\uFF0C2\u5E74\u4EE5\u4E0A\u3002", price: 24.99, categoryId: "cat-2", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "prod-5", name: "Google Gmail \u8001\u53F7", description: "2022\u5E74\u521B\u5EFA\u7684 Google \u8D26\u53F7\uFF0C\u8BB0\u5F55\u5E72\u51C0\u3002", price: 3.99, categoryId: "cat-3", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "prod-6", name: "Instagram \u8001\u53F7 (2021)", description: "2021\u5E74\u6CE8\u518C\uFF0C\u6709\u771F\u5B9E\u5E16\u5B50\uFF0C\u8BB0\u5F55\u5E72\u51C0\u3002", price: 6.99, categoryId: "cat-4", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "prod-7", name: "Discord Nitro \u8D26\u53F7", description: "\u5E26 Nitro \u8BA2\u9605\u7684 Discord \u8D26\u53F7\uFF0C\u5269\u4F593\u4E2A\u6708\u3002", price: 9.99, categoryId: "cat-5", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "prod-8", name: "TikTok \u8001\u53F7", description: "1K+ \u7C89\u4E1D\u7684 TikTok \u8001\u53F7\uFF0C\u8BB0\u5F55\u5E72\u51C0\u3002", price: 7.49, categoryId: "cat-6", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "prod-9", name: "Telegram \u65B0\u53F7", description: "\u65B0\u6CE8\u518C\u7684 Telegram \u8D26\u53F7\uFF0C\u5DF2\u9A8C\u8BC1\u624B\u673A\u53F7\u3002", price: 1.99, categoryId: "cat-1", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "prod-1", name: "Telegram \u8001\u53F7 (2022)", description: "2022\u5E74\u6CE8\u518C\u7684 Telegram \u8001\u53F7\uFF0C\u65E0\u5C01\u7981\u8BB0\u5F55\u3002", price: 39.99, categoryId: "cat-1", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "prod-2", name: "Telegram Premium \u8D26\u53F7", description: "\u5E26 Premium \u8BA2\u9605\u7684 Telegram \u8D26\u53F7\u3002", price: 89.99, categoryId: "cat-1", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "prod-3", name: "Twitter \u8001\u53F7 (2021)", description: "2021\u5E74\u6CE8\u518C\uFF0C\u6709\u81EA\u7136\u7C89\u4E1D\uFF0C\u90AE\u7BB1\u5DF2\u9A8C\u8BC1\u3002", price: 59.99, categoryId: "cat-2", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "prod-4", name: "Twitter \u9AD8\u7C89\u53F7", description: "5K+ \u771F\u5B9E\u7C89\u4E1D\u7684 Twitter \u8D26\u53F7\uFF0C2\u5E74\u4EE5\u4E0A\u3002", price: 179.99, categoryId: "cat-2", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "prod-5", name: "Google Gmail \u8001\u53F7", description: "2022\u5E74\u521B\u5EFA\u7684 Google \u8D26\u53F7\uFF0C\u8BB0\u5F55\u5E72\u51C0\u3002", price: 28.99, categoryId: "cat-3", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "prod-6", name: "Instagram \u8001\u53F7 (2021)", description: "2021\u5E74\u6CE8\u518C\uFF0C\u6709\u771F\u5B9E\u5E16\u5B50\uFF0C\u8BB0\u5F55\u5E72\u51C0\u3002", price: 49.99, categoryId: "cat-4", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "prod-7", name: "Discord Nitro \u8D26\u53F7", description: "\u5E26 Nitro \u8BA2\u9605\u7684 Discord \u8D26\u53F7\uFF0C\u5269\u4F593\u4E2A\u6708\u3002", price: 69.99, categoryId: "cat-5", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "prod-8", name: "TikTok \u8001\u53F7", description: "1K+ \u7C89\u4E1D\u7684 TikTok \u8001\u53F7\uFF0C\u8BB0\u5F55\u5E72\u51C0\u3002", price: 53.99, categoryId: "cat-6", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "prod-9", name: "Telegram \u65B0\u53F7", description: "\u65B0\u6CE8\u518C\u7684 Telegram \u8D26\u53F7\uFF0C\u5DF2\u9A8C\u8BC1\u624B\u673A\u53F7\u3002", price: 14.99, categoryId: "cat-1", stockType: "one_time", isActive: true, image: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 ];
 
 function generateDefaultCards(): CardItem[] {
@@ -226,6 +233,7 @@ const defaultData: StoreData = {
   orders: defaultOrders,
   settings: defaultSettings,
   paymentChannels: defaultPaymentChannels,
+  adminToken: "cs_admin_2024_secure",
 };
 
 function isBrowser(): boolean {
@@ -535,4 +543,22 @@ export function resetStore(): void {
   if (!isBrowser()) return;
   localStorage.removeItem(STORAGE_KEY);
   initializeStore();
+}
+
+// ============================================
+// Admin Credentials
+// ============================================
+export function updateAdminCredentials(username: string, password: string): SiteSettings {
+  const store = getStore();
+  store.settings.adminUsername = username;
+  store.settings.adminPassword = password;
+  // 同时更新 token（用新凭据生成新 token）
+  const newToken = "cs_" + Date.now().toString(36) + "_secure";
+  store.adminToken = newToken;
+  saveData(store);
+  return store.settings;
+}
+
+export function getAdminToken(): string {
+  return getStore().adminToken;
 }

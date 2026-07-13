@@ -1,12 +1,20 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ShoppingCart, Search, Menu, Globe } from "lucide-react";
 import { useLocaleStore } from "@/store/use-locale-store";
 import { t } from "@/lib/i18n";
+import { getSettings } from "@/lib/mock-data";
 
 export default function Header() {
   const { locale, setLocale } = useLocaleStore();
+  const [siteName, setSiteName] = useState(t("common.siteName"));
+
+  useEffect(() => {
+    const s = getSettings();
+    if (s.siteName) setSiteName(s.siteName);
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-glass-border bg-dark-1/80 backdrop-blur-xl">
@@ -17,22 +25,16 @@ export default function Header() {
             <span className="text-black font-bold text-sm">CS</span>
           </div>
           <span className="text-light-3 font-semibold text-lg tracking-tight">
-            {t("common.siteName")}
+            {siteName}
           </span>
         </Link>
 
         {/* Nav */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link
-            href="/"
-            className="text-sm text-gray-4 hover:text-light-3 transition-colors"
-          >
+          <Link href="/" className="text-sm text-gray-4 hover:text-light-3 transition-colors">
             {t("header.products")}
           </Link>
-          <Link
-            href="/order/query"
-            className="text-sm text-gray-4 hover:text-light-3 transition-colors"
-          >
+          <Link href="/order/query" className="text-sm text-gray-4 hover:text-light-3 transition-colors">
             {t("header.trackOrder")}
           </Link>
         </nav>

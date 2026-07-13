@@ -4,7 +4,7 @@ export const locales: Record<Locale, Record<string, string>> = {
   en: {
     // Common
     "common.siteName": "CardShop",
-    "common.currency": "$",
+    "common.currency": "¥",
     "common.inStock": "in stock",
     "common.lowStock": "Low Stock",
     "common.buyNow": "Buy Now",
