@@ -73,7 +73,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {features.map((f) => (
             <div key={f.title} className="glass-card p-6 flex items-start gap-4">
-              <div className="p-2.5 rounded-lg bg-white/[0.04] text-gray-4">{f.icon}</div>
+              <div className="p-2.5 rounded-lg bg-gradient-to-br from-[#f09433] via-[#dc2743] to-[#bc1888] text-white shadow-lg">{f.icon}</div>
               <div><h3 className="text-sm font-medium text-light-3 mb-1">{f.title}</h3><p className="text-xs text-gray-3">{f.desc}</p></div>
             </div>
           ))}
@@ -90,7 +90,7 @@ export default function HomePage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 stagger-children">
           {categories.map((cat) => (
             <Link key={cat.id} href={`/category/${cat.slug}`} className="glass-card p-6 flex flex-col items-center text-center group">
-              <div className="w-12 h-12 rounded-xl bg-dark-3 border border-glass-border flex items-center justify-center mb-3 text-gray-4 group-hover:text-light-3 group-hover:border-white/15 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center mb-3 text-white shadow-lg group-hover:scale-110 transition-transform">
                 {categoryIcons[cat.slug] || <Package size={24} />}
               </div>
               <h3 className="text-sm font-medium text-light-3 mb-1">{cat.name}</h3>
